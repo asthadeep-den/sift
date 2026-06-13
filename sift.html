@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sift — Tender Relevance Engine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;450;500;600&family=Space+Mono:wght@400;700&family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FBFAF7; --ink:#181613; --muted:#6B6A64; --faint:#9A988F;
+    --hair:#E5E2D9; --panel:#FFFFFF;
+    --hi:#F4DE45; --hi-soft:#FBEE84; --hi-wash:#FCF6C9;
+    --go:#2F7A57; --go-bg:#E9F2EC;
+    --cau:#B97D14; --cau-bg:#F8EFD9;
+    --no:#A8362B; --no-bg:#F6E5E2;
+    --disp:"Space Grotesk",sans-serif; --body:"Inter",sans-serif; --mono:"Space Mono",monospace; --script:"Dancing Script",cursive;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);
+    font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+  a{color:inherit}
+  ::selection{background:var(--hi-soft)}
+
+  header.top{border-bottom:1px solid var(--hair);background:var(--paper);position:sticky;top:0;z-index:30}
+  .top-inner{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 24px;max-width:1080px;margin:0 auto;flex-wrap:wrap}
+  .brand{display:flex;align-items:flex-end;gap:13px}
+  .mark{font-family:var(--script);font-weight:700;font-size:36px;letter-spacing:.01em;position:relative;line-height:.85}
+  .mark .hl{background:linear-gradient(180deg,transparent 74%,var(--hi-soft) 74%);padding:0 7px}
+  .brand .sub{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding-bottom:6px}
+  .profile{display:flex;gap:10px;flex-wrap:wrap}
+  .chip{font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;border:1px solid var(--hair);
+    border-radius:2px;padding:5px 9px;background:var(--panel);white-space:nowrap}
+  .chip b{color:var(--ink)} .chip .lbl{color:var(--faint);text-transform:uppercase;letter-spacing:.1em;margin-right:6px}
+  .chip.neg b{color:var(--no)} .chip.pos b{color:var(--go)}
+
+  .hero{padding:54px 0 30px}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin:0 0 18px}
+  .hero h1{font-family:var(--disp);font-weight:600;font-size:clamp(30px,5.2vw,52px);line-height:1.04;letter-spacing:-.025em;margin:0 0 18px;max-width:16ch}
+  .hero h1 .swept{background:linear-gradient(180deg,transparent 60%,var(--hi) 60%);padding:0 4px}
+  .hero p.lede{font-size:17px;line-height:1.5;max-width:60ch;color:#2c2a25;margin:0}
+  .hero .meaning{margin-top:14px;font-size:13.5px;color:var(--muted);max-width:62ch}
+  .hero .meaning b{color:var(--ink);font-weight:600}
+
+  .tabs{display:flex;gap:4px;border-bottom:1px solid var(--hair);margin-top:34px;flex-wrap:wrap}
+  .tab{font-family:var(--disp);font-weight:500;font-size:15px;letter-spacing:-.01em;background:none;border:none;
+    color:var(--muted);padding:13px 18px;cursor:pointer;position:relative;border-radius:0}
+  .tab .n{font-family:var(--mono);font-size:11px;color:var(--faint);margin-right:8px}
+  .tab[aria-selected="true"]{color:var(--ink)}
+  .tab[aria-selected="true"]::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:3px;background:var(--hi)}
+  .tab:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+  .tab .live-dot{display:inline-block;width:6px;height:6px;border-radius:99px;background:var(--no);margin-left:7px;vertical-align:middle;animation:pulse 1.8s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+  .panel{display:none;padding:34px 0 70px;animation:fade .35s ease}
+  .panel[data-active="true"]{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  .feed-head,.eng-head{margin-bottom:8px}
+  .feed-head h2,.eng-head h2{font-family:var(--disp);font-weight:600;font-size:21px;letter-spacing:-.02em;margin:0}
+  .feed-head p,.eng-head p{margin:6px 0 0;color:var(--muted);font-size:13.5px;max-width:62ch}
+  .filterbar{display:flex;gap:6px;flex-wrap:wrap;margin:22px 0 26px}
+  .fbtn{font-family:var(--mono);font-size:11px;letter-spacing:.04em;text-transform:uppercase;border:1px solid var(--hair);
+    background:var(--panel);color:var(--muted);padding:7px 12px;border-radius:2px;cursor:pointer}
+  .fbtn[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+  .fbtn:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:1px;background:var(--hair);border:1px solid var(--hair)}
+  .card{background:var(--panel);padding:20px;display:flex;flex-direction:column;gap:12px}
+  .card.hidden{display:none}
+  .card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+  .card h3{font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:-.015em;margin:0;line-height:1.15}
+  .card .acr{font-family:var(--mono);font-size:11px;color:var(--faint);display:block;margin-top:3px;letter-spacing:.05em}
+  .rel{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;padding:4px 7px;border-radius:2px;white-space:nowrap;font-weight:700}
+  .rel.high{background:var(--go-bg);color:var(--go)} .rel.med{background:var(--cau-bg);color:var(--cau)} .rel.low{background:#EEEDE7;color:var(--muted)}
+  .card .what{font-size:13px;color:#332f29;line-height:1.5;margin:0}
+  .card .why{font-size:12.5px;color:var(--muted);line-height:1.5;margin:0;padding-left:12px;border-left:2px solid var(--hi)}
+  .card .why b{color:var(--ink);font-weight:600}
+  .card-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:2px}
+  .tag{font-family:var(--mono);font-size:10px;letter-spacing:.04em;color:var(--muted);border:1px solid var(--hair);padding:3px 6px;border-radius:2px}
+  .card a.go{font-family:var(--mono);font-size:11px;letter-spacing:.05em;text-decoration:none;color:var(--ink);
+    margin-top:auto;display:inline-flex;align-items:center;gap:6px;width:fit-content;border-bottom:1px solid var(--hi);padding-bottom:2px}
+  .card a.go:hover{background:var(--hi-wash)}
+  .card a.go::after{content:"↗"}
+  .added{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink);
+    background:var(--hi-soft);padding:2px 5px;border-radius:2px;align-self:flex-start}
+
+  /* engine */
+  .eng-grid{display:grid;grid-template-columns:1fr 360px;gap:28px;align-items:start}
+  @media(max-width:880px){.eng-grid{grid-template-columns:1fr}}
+  .form-sec{margin-bottom:26px}
+  .form-sec > .lab{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
+    display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .form-sec > .lab::after{content:"";flex:1;height:1px;background:var(--hair)}
+  .form-sec > .lab .qn{font-family:var(--mono);color:var(--faint)}
+  .opts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  @media(max-width:520px){.opts{grid-template-columns:1fr}}
+  .opt{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--hair);background:var(--panel);
+    padding:11px 12px;border-radius:3px;cursor:pointer;font-size:13.5px;line-height:1.35;transition:border-color .12s,background .12s}
+  .opt:hover{border-color:var(--faint)}
+  .opt input{margin-top:2px;accent-color:var(--ink);width:15px;height:15px;flex:none}
+  .opt.checked{border-color:var(--ink);background:#FCFBF6}
+  .opt .ot{font-weight:500}.opt .od{display:block;color:var(--muted);font-size:11.5px;font-weight:400}
+  .opt:focus-within{outline:2px solid var(--ink);outline-offset:1px}
+  .markers{display:flex;flex-wrap:wrap;gap:6px}
+  .mk{font-family:var(--mono);font-size:11px;letter-spacing:.03em;border:1px solid var(--hair);background:var(--panel);
+    color:var(--muted);padding:6px 9px;border-radius:2px;cursor:pointer;user-select:none}
+  .mk[aria-pressed="true"]{background:var(--hi);border-color:var(--hi);color:var(--ink);font-weight:700}
+  .mk:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+  .seg{display:flex;border:1px solid var(--hair);border-radius:3px;overflow:hidden;width:fit-content;max-width:100%;flex-wrap:wrap}
+  .seg button{font-family:var(--body);font-size:13px;background:var(--panel);border:none;border-right:1px solid var(--hair);
+    padding:9px 13px;cursor:pointer;color:var(--muted)}
+  .seg button:last-child{border-right:none}
+  .seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+  .seg button:focus-visible{outline:2px solid var(--ink);outline-offset:-2px}
+  .hint{font-size:11.5px;color:var(--faint);margin:7px 0 0;font-style:italic}
+  .rail{position:sticky;top:88px}
+  .verdict{border:1px solid var(--hair);background:var(--panel);border-radius:4px;overflow:hidden}
+  .v-band{padding:18px 20px;border-bottom:1px solid var(--hair);transition:background .3s}
+  .v-band.go{background:var(--go-bg)}.v-band.cau{background:var(--cau-bg)}.v-band.no{background:var(--no-bg)}.v-band.idle{background:#F3F2EC}
+  .v-verd{font-family:var(--disp);font-weight:700;font-size:24px;letter-spacing:-.02em;line-height:1;display:flex;align-items:baseline;gap:10px}
+  .v-verd.go{color:var(--go)}.v-verd.cau{color:var(--cau)}.v-verd.no{color:var(--no)}.v-verd.idle{color:var(--faint)}
+  .v-sub{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:7px}
+  .meter{height:8px;background:#ECEAE2;border-radius:99px;margin-top:14px;overflow:hidden}
+  .meter i{display:block;height:100%;width:0;border-radius:99px;transition:width .45s cubic-bezier(.4,0,.2,1)}
+  .meter i.go{background:var(--go)}.meter i.cau{background:var(--cau)}.meter i.no{background:var(--no)}
+  .v-pct{font-family:var(--disp);font-weight:700;font-size:15px;margin-left:auto;align-self:center}
+  .v-sec{padding:15px 20px;border-bottom:1px solid var(--hair)}
+  .v-sec:last-child{border-bottom:none}
+  .v-sec h4{font-family:var(--mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+  .bd{display:flex;align-items:center;gap:10px;margin-bottom:9px;font-size:12.5px}
+  .bd:last-child{margin-bottom:0}
+  .bd .bn{font-family:var(--mono);font-size:11px;color:var(--faint);width:34px;flex:none}
+  .bd .bbar{flex:1;height:5px;background:#ECEAE2;border-radius:99px;overflow:hidden}
+  .bd .bbar i{display:block;height:100%;background:var(--ink);width:0;transition:width .4s}
+  .bd .bv{font-family:var(--mono);font-size:11px;width:42px;text-align:right;flex:none;color:var(--muted)}
+  .flags{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+  .flag{display:flex;gap:9px;font-size:12.5px;line-height:1.4;align-items:flex-start}
+  .flag .ic{font-family:var(--mono);font-weight:700;flex:none;width:16px;text-align:center;border-radius:2px;font-size:11px;line-height:1.4}
+  .flag.stop .ic{color:var(--no)} .flag.warn .ic{color:var(--cau)} .flag.ok .ic{color:var(--go)}
+  .flag.stop{color:#5a2520} .flag.ok{color:#244c38}
+  .clar{list-style:none;margin:0;padding:0;counter-reset:c}
+  .clar li{font-size:12.5px;line-height:1.45;padding:8px 0 8px 26px;border-top:1px dashed var(--hair);position:relative;color:#332f29}
+  .clar li:first-child{border-top:none}
+  .clar li::before{counter-increment:c;content:"Q"counter(c);position:absolute;left:0;top:8px;font-family:var(--mono);font-size:10px;color:var(--ink);background:var(--hi-soft);padding:1px 4px;border-radius:2px}
+  .synopsis{font-size:13px;line-height:1.55;color:#2c2a25;margin:0}
+  .synopsis b{font-weight:600}
+  .empty{color:var(--faint);font-size:12.5px;font-style:italic}
+  .resetbtn{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;background:none;
+    border:1px solid var(--hair);color:var(--muted);padding:7px 12px;border-radius:2px;cursor:pointer;margin-top:18px}
+  .resetbtn:hover{border-color:var(--ink);color:var(--ink)}
+
+  /* ---- live wire ---- */
+  .live-note{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--hair);background:#FCFBF6;border-radius:4px;padding:14px 16px;margin:22px 0 20px;font-size:12.5px;line-height:1.5;color:var(--muted)}
+  .live-note .b{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);background:var(--hi);padding:3px 7px;border-radius:2px;flex:none;font-weight:700}
+  .live-note b{color:var(--ink);font-weight:600}
+  .searchrow{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+  .searchrow input{flex:1;min-width:240px;font-family:var(--body);font-size:15px;border:1px solid var(--hair);
+    background:var(--panel);border-radius:3px;padding:13px 15px;color:var(--ink)}
+  .searchrow input:focus{outline:2px solid var(--ink);outline-offset:-1px;border-color:var(--ink)}
+  .searchrow button{font-family:var(--disp);font-weight:600;font-size:14px;letter-spacing:-.01em;border:none;
+    background:var(--ink);color:var(--paper);padding:0 22px;border-radius:3px;cursor:pointer;white-space:nowrap}
+  .searchrow button:hover{background:#000}
+  .searchrow button:disabled{opacity:.5;cursor:wait}
+  .searchrow button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+  .presets{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:22px}
+  .preset{font-family:var(--mono);font-size:11px;letter-spacing:.02em;border:1px solid var(--hair);background:var(--panel);
+    color:var(--muted);padding:6px 10px;border-radius:99px;cursor:pointer}
+  .preset:hover{border-color:var(--ink);color:var(--ink);background:var(--hi-wash)}
+  .status{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;color:var(--muted);min-height:20px;margin-bottom:18px;display:flex;align-items:center;gap:9px}
+  .status .dot{width:7px;height:7px;border-radius:99px;background:var(--cau);animation:pulse 1s infinite;flex:none}
+  .status.err{color:var(--no)} .status.ok{color:var(--go)}
+  .live-results{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:1px;background:var(--hair);border:1px solid var(--hair)}
+  .live-results:empty{border:none;background:none}
+  .lr{background:var(--panel);padding:18px;display:flex;flex-direction:column;gap:10px}
+  .lr-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+  .lr .ttype{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;font-weight:700;padding:4px 7px;border-radius:2px;white-space:nowrap}
+  .ttype.eoi{background:var(--go-bg);color:var(--go)} .ttype.rfp{background:var(--cau-bg);color:var(--cau)} .ttype.tender{background:#EEEDE7;color:var(--muted)}
+  .lr h3{font-family:var(--disp);font-weight:600;font-size:15.5px;line-height:1.2;letter-spacing:-.01em;margin:0}
+  .lr .auth{font-size:12px;color:var(--muted);margin:0}
+  .lr .dl{font-family:var(--mono);font-size:11px;color:var(--ink)}
+  .lr .dl b{color:var(--no)}
+  .lr .lnote{font-size:12px;color:#332f29;line-height:1.45;margin:0;padding-left:11px;border-left:2px solid var(--hi)}
+  .lr a.src{font-family:var(--mono);font-size:11px;text-decoration:none;color:var(--ink);margin-top:auto;width:fit-content;border-bottom:1px solid var(--hi);padding-bottom:2px}
+  .lr a.src::after{content:" ↗"}
+  .skel{background:var(--panel);padding:18px;display:flex;flex-direction:column;gap:11px}
+  .skel span{display:block;height:11px;border-radius:3px;background:linear-gradient(90deg,#EFEDE5 25%,#F6F4EE 50%,#EFEDE5 75%);background-size:200% 100%;animation:sh 1.3s infinite}
+  .skel span:nth-child(1){width:30%;height:9px}.skel span:nth-child(2){width:85%;height:14px}.skel span:nth-child(3){width:55%}.skel span:nth-child(4){width:95%}
+  @keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+  footer{border-top:1px solid var(--hair);padding:22px 0 40px;color:var(--faint);font-size:11.5px;line-height:1.6}
+  footer b{color:var(--muted)}
+  .kbd{font-family:var(--mono)}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-inner">
+    <div class="brand">
+      <span class="mark"><span class="hl">Sift</span></span>
+      <span class="sub">Tender Relevance Engine</span>
+    </div>
+    <div class="profile" aria-label="Bidder profile">
+      <span class="chip"><span class="lbl">Revenue</span><b>₹100 Cr+</b></span>
+      <span class="chip neg"><span class="lbl">Net worth</span><b>Negative</b></span>
+      <span class="chip pos"><span class="lbl">Consortium</span><b>Permitted</b></span>
+      <span class="chip"><span class="lbl">Offer</span><b>Trainers · Infra · PIA</b></span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="hero">
+    <p class="eyebrow">Skill-development implementation · firm-grade bids only</p>
+    <h1>Pass or no-pass, <span class="swept">before you read 80 pages.</span></h1>
+    <p class="lede">A consultant's lens on every skilling tender from the high-paying funders — UN, ADB, GIZ, JICA, the World Bank and the domestic skilling stack — sourced live, scored for relevance, and screened against the one constraint that decides everything here: a strong top line carried by a negative net worth.</p>
+    <p class="meaning"><b>Sift</b> — to pass a thing through a fine mesh until only what is worth keeping stays in your hand. Two hundred tenders go in; the three worth bidding come out.</p>
+
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" id="tab-feed" aria-selected="true" aria-controls="p-feed"><span class="n">01</span>Funder Feed</button>
+      <button class="tab" role="tab" id="tab-eng" aria-selected="false" aria-controls="p-eng"><span class="n">02</span>Triage Engine</button>
+      <button class="tab" role="tab" id="tab-live" aria-selected="false" aria-controls="p-live"><span class="n">03</span>Live Wire<span class="live-dot"></span></button>
+    </div>
+  </section>
+
+  <!-- ===================== TAB 1 : FEED ===================== -->
+  <section class="panel" id="p-feed" role="tabpanel" data-active="true" aria-labelledby="tab-feed">
+    <div class="feed-head">
+      <div>
+        <h2>Who to watch, and why it matters to you</h2>
+        <p>The funders that repeatedly float firm-based, consortium-friendly skilling work. Your four anchors plus the additions that actually fit your sectors. Links go to the live procurement page.</p>
+      </div>
+    </div>
+    <div class="filterbar" id="filterbar" aria-label="Filter funders">
+      <button class="fbtn" data-f="all" aria-pressed="true">All</button>
+      <button class="fbtn" data-f="high" aria-pressed="false">High relevance</button>
+      <button class="fbtn" data-f="multilateral" aria-pressed="false">Multilateral / bilateral</button>
+      <button class="fbtn" data-f="domestic" aria-pressed="false">Domestic stack</button>
+      <button class="fbtn" data-f="japan" aria-pressed="false">Japan corridor</button>
+      <button class="fbtn" data-f="added" aria-pressed="false">Added by Sift</button>
+    </div>
+    <div class="cards" id="cards"></div>
+  </section>
+
+  <!-- ===================== TAB 2 : ENGINE ===================== -->
+  <section class="panel" id="p-eng" role="tabpanel" data-active="false" aria-labelledby="tab-eng">
+    <div class="eng-head" style="margin-bottom:26px">
+      <h2>Triage a tender</h2>
+      <p>Read only the cover, scope and eligibility sections of the RFP, set the switches below, and Sift returns a relevance score, the go/no-go verdict, the risk flags, and the pre-bid questions worth raising.</p>
+    </div>
+    <div class="eng-grid">
+      <div class="form-col">
+        <div class="form-sec">
+          <div class="lab"><span>Bidder type the tender invites</span><span class="qn">gate</span></div>
+          <div class="seg" id="seg-firm" role="group" aria-label="Bidder type">
+            <button data-v="firm" aria-pressed="true">Firm / agency</button>
+            <button data-v="either" aria-pressed="false">Firm or individual</button>
+            <button data-v="individual" aria-pressed="false">Individuals only</button>
+          </div>
+          <p class="hint">You bid as a firm. Individual-only invitations fail the gate outright.</p>
+        </div>
+        <div class="form-sec">
+          <div class="lab"><span>Sectors in scope</span><span class="qn">0–30</span></div>
+          <div class="opts" id="sectors"></div>
+        </div>
+        <div class="form-sec">
+          <div class="lab"><span>Ecosystem markers present in the document</span><span class="qn">0–20</span></div>
+          <div class="markers" id="markers"></div>
+          <p class="hint">Tap the codes that appear in the RFP. Density signals a genuine firm-grade TVET tender rather than a one-off procurement.</p>
+        </div>
+        <div class="form-sec">
+          <div class="lab"><span>What the scope asks you to bring</span><span class="qn">0–15</span></div>
+          <div class="opts" id="deliver"></div>
+        </div>
+        <div class="form-sec">
+          <div class="lab"><span>Funder</span><span class="qn">0–20</span></div>
+          <div class="seg" id="seg-funder" role="group" aria-label="Funder tier" style="flex-wrap:wrap">
+            <button data-v="3" aria-pressed="true">UN / ADB / GIZ / JICA / WB</button>
+            <button data-v="2" aria-pressed="false">NSDC / State mission</button>
+            <button data-v="1" aria-pressed="false">GeM / line dept</button>
+          </div>
+        </div>
+        <div class="form-sec">
+          <div class="lab"><span>Financial eligibility — the decider</span><span class="qn">0–15 · gate</span></div>
+          <div class="seg" id="seg-nw" role="group" aria-label="Net worth treatment" style="flex-wrap:wrap;margin-bottom:10px">
+            <button data-v="none" aria-pressed="true">No net-worth clause</button>
+            <button data-v="agg" aria-pressed="false">Aggregated across consortium</button>
+            <button data-v="floor" aria-pressed="false">Individual positive floor</button>
+          </div>
+          <div class="seg" id="seg-cons" role="group" aria-label="Consortium" style="flex-wrap:wrap;margin-bottom:10px">
+            <button data-v="yes" aria-pressed="true">Consortium / JV allowed</button>
+            <button data-v="no" aria-pressed="false">Sole bidder only</button>
+          </div>
+          <div class="opts">
+            <label class="opt" data-toggle="turnover"><input type="checkbox" id="t-turnover"><span><span class="ot">Turnover ask &gt; ₹100 Cr equiv.</span><span class="od">Above your top line even after aggregation</span></span></label>
+            <label class="opt" data-toggle="debar"><input type="checkbox" id="t-debar"><span><span class="ot">Debarred / blacklisted</span><span class="od">You or a named partner</span></span></label>
+          </div>
+          <p class="hint">Negative net worth is survivable only where the clause is absent or aggregated and a positive-net-worth partner leads. An individual floor with sole-bidder-only is a hard stop.</p>
+        </div>
+        <button class="resetbtn" id="reset">Reset switches</button>
+      </div>
+
+      <aside class="rail">
+        <div class="verdict">
+          <div class="v-band idle" id="vband">
+            <div style="display:flex;align-items:baseline">
+              <div class="v-verd idle" id="vverd">—<span style="font-family:var(--mono);font-size:11px;letter-spacing:.1em"></span></div>
+              <div class="v-pct" id="vpct">0%</div>
+            </div>
+            <div class="v-sub" id="vsub">set the switches to score</div>
+            <div class="meter"><i class="" id="vmeter"></i></div>
+          </div>
+          <div class="v-sec">
+            <h4>Score breakdown</h4>
+            <div class="bd"><span class="bn">SCT</span><span class="bbar"><i id="b-sct"></i></span><span class="bv" id="v-sct">0/30</span></div>
+            <div class="bd"><span class="bn">MRK</span><span class="bbar"><i id="b-mrk"></i></span><span class="bv" id="v-mrk">0/20</span></div>
+            <div class="bd"><span class="bn">FND</span><span class="bbar"><i id="b-fnd"></i></span><span class="bv" id="v-fnd">0/20</span></div>
+            <div class="bd"><span class="bn">DLV</span><span class="bbar"><i id="b-dlv"></i></span><span class="bv" id="v-dlv">0/15</span></div>
+            <div class="bd"><span class="bn">FIN</span><span class="bbar"><i id="b-fin"></i></span><span class="bv" id="v-fin">0/15</span></div>
+          </div>
+          <div class="v-sec"><h4>Risk flags</h4><ul class="flags" id="flags"><li class="empty">No flags yet.</li></ul></div>
+          <div class="v-sec"><h4>Pre-bid clarifications to raise</h4><ol class="clar" id="clar"><li class="empty" style="padding-left:0;border:none">Nothing to ask yet.</li></ol></div>
+          <div class="v-sec"><h4>One-line synopsis</h4><p class="synopsis empty" id="syn">Awaiting input.</p></div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ===================== TAB 3 : LIVE WIRE ===================== -->
+  <section class="panel" id="p-live" role="tabpanel" data-active="false" aria-labelledby="tab-live">
+    <div class="eng-head">
+      <h2>Live Wire — search the open market</h2>
+      <p>Run a real web search for current EOIs, RFPs and tenders across the skilling funders. Results come back parsed: authority, type, deadline, source link, and a one-line relevance read tuned to this firm's profile.</p>
+    </div>
+
+    <div class="live-note">
+      <span class="b">Where it runs</span>
+      <div id="modeNote">Live search calls Claude's API with web search enabled. <b>Inside the Claude artifact view it works as-is.</b> On your deployed (Vercel) build, flip <code>LIVE.mode</code> to <code>"proxy"</code> in the script and drop in the <code>search.js</code> serverless function — a browser can't hold your API key directly.</div>
+    </div>
+
+    <div class="searchrow">
+      <input id="q" type="text" placeholder="e.g. JICA TITP sending organisation RFP 2026" aria-label="Search query">
+      <button id="searchBtn">Search the wire</button>
+    </div>
+    <div class="presets" id="presets"></div>
+    <div class="status" id="status" aria-live="polite"></div>
+    <div class="live-results" id="liveResults"></div>
+  </section>
+
+  <footer>
+    <b>Sift v2 · live-sourcing.</b> Funder Feed links point to live official procurement pages or the funder's designated channel (GIZ → TendersOnTime). Live Wire runs a real-time web search and parses what it finds; treat every result as a lead to verify on the source page, not a confirmed live tender. Deadlines and eligibility shown are only as accurate as the public listing.<br>
+    Scoring is a triage aid built on this firm's stated profile (₹100 Cr+ revenue, negative net worth, consortium-enabled). It is not eligibility certification — the Notice Inviting Tender always governs, and net-worth, solvency and prior-experience clauses are non-negotiable once stated. <span class="kbd">Tab</span> / <span class="kbd">Shift-Tab</span> to move.
+  </footer>
+</div>
+
+<script>
+/* ================= CONFIG ================= */
+const LIVE = {
+  mode:  "direct",          // "direct" = Claude artifact view (key handled for you) | "proxy" = your deployed serverless backend
+  proxyUrl: "/api/search",  // your Vercel function endpoint (see search.js) — used when mode === "proxy"
+  model: "claude-sonnet-4-6"
+};
+
+/* ---------------- FEED DATA ---------------- */
+const FUNDERS = [
+  {name:"UN Global Marketplace", acr:"UNGM · UNDP·UNICEF·ILO·UNESCO·UN Women", rel:"med", cats:["multilateral"],
+   what:"Single window for UN-system procurement. UN agencies float livelihood, employability and gender-in-skilling assignments for implementing firms.",
+   why:"High-paying and brand-defining, but skilling work is intermittent and competition is global. Register the firm + set alerts for 'vocational / livelihood / employability'.",
+   meta:["RFP / EOI","Global field","Register once"], url:"https://www.ungm.org"},
+  {name:"Asian Development Bank", acr:"ADB · CSRN consulting window", rel:"high", cats:["multilateral","high"],
+   what:"Loan- and TA-financed human-resource-development and skills projects. Consulting EOIs run through the CSRN portal; project goods/works through project procurement.",
+   why:"A flagship high-paying client. Watch state HRD/skills loans where you can enter as an implementation partner. Turnover-weighted criteria favour your ₹100 Cr top line.",
+   meta:["EOI → RFP","QCBS","CSRN alerts"], url:"https://csrn.adb.org"},
+  {name:"GIZ India", acr:"Deutsche Gesellschaft für Int'l Zusammenarbeit", rel:"high", cats:["multilateral","high"],
+   what:"German cooperation's Economic Development & Vocational Training portfolio generates steady RFPs for training providers, curriculum and implementation partners.",
+   why:"TVET is core GIZ business, not a side bet — the single best structural fit on this list. GIZ publishes its tenders through TendersOnTime; set that as your GIZ feed.",
+   meta:["RFP","TVET-native","via TendersOnTime"], url:"https://www.tendersontime.com/giz-tenders/"},
+  {name:"Government e-Marketplace", acr:"GeM", rel:"med", cats:["domestic"],
+   what:"Central/state buyers procure standardised services here, including some training and manpower categories, via catalogue bids and custom bids.",
+   why:"High volume but skews to commoditised, lowest-price service buys. Firm-grade implementation RFPs more often sit on CPP / state portals — treat GeM as a secondary scan.",
+   meta:["Bid / RA","Price-led","Secondary"], url:"https://gem.gov.in"},
+  {name:"World Bank — Projects", acr:"IBRD/IDA · SANKALP · STRIVE", rel:"high", cats:["multilateral","high","added"], added:true,
+   what:"Bank-financed skilling operations (SANKALP, STRIVE, Skill India Mission Operation) generate EOIs for PIAs, PMUs, verification agencies and gap studies.",
+   why:"Directly skilling-themed and high-value. The procurement search lists live skilling REOIs by name — query 'skill / SANKALP / STRIVE' and track the implementing state.",
+   meta:["REOI","Skilling-native","Search by project"], url:"https://projects.worldbank.org/en/projects-operations/procurement"},
+  {name:"JICA — Japan corridor", acr:"JICA-ODA · TITP / SSW", rel:"high", cats:["multilateral","high","japan","added"], added:true,
+   what:"Japanese ODA underwrites the Technical Intern Training Programme and Specified Skilled Worker pipeline. State missions float RFPs to select Sending Organisations under JICA-ODA.",
+   why:"Maps onto three of your parameters at once — Japanese language, nursing & caretaking (SSW care), hospitality. Watch state Kaushal Nigams for 'Sending Organisation' RFPs.",
+   meta:["RFP / EOI","TITP-SSW","Highest param-fit"], url:"https://www.tendersontime.com/japan-international-cooperation-agency-jica-tenders/"},
+  {name:"NSDC / MSDE", acr:"National Skill Dev. Corp.", rel:"high", cats:["domestic","high","japan","added"], added:true,
+   what:"The apex domestic body. Posts TITP Sending-Organisation empanelment, PMKVY 4.0 PIA EOIs, Flexi-MoU rounds and SSC-linked training mandates.",
+   why:"Your bread-and-butter feed — firm-based, consortium-friendly, and where TITP/SSW empanelment originates. Check Active Tenders weekly; cadence is irregular.",
+   meta:["EOI / empanelment","PIA route","Check weekly"], url:"https://nsdcindia.org/active-tender"},
+  {name:"State Skill Development Missions", acr:"ASDM · HPKVN · TNSDC · others", rel:"high", cats:["domestic","high","added"], added:true,
+   what:"State Kaushal Nigams / missions float the highest volume of firm-based EOIs — Training-Provider empanelment, CoE/ASTI setup, PMKVY state component, and JICA Sending-Org RFPs.",
+   why:"Where the implementable, consortium-shaped work actually lives. Himachal's HPKVN, for instance, has run the JICA-ODA Sending-Organisation RFP. Track 3–4 active states.",
+   meta:["EOI","Highest volume","Firm-grade"], url:"https://asdm.assam.gov.in/portlets/tenders"},
+  {name:"Central Public Procurement", acr:"CPPP · eprocure.gov.in", rel:"med", cats:["domestic"],
+   what:"Aggregates central-ministry and PSU EOIs/RFPs, including line-ministry skilling, training-of-trainers and consultancy mandates across departments.",
+   why:"The catch-all for central-government firm tenders that don't sit on GeM. Set saved searches on the skilling keyword set and your sector terms.",
+   meta:["EOI / RFP","Central govt","Saved search"], url:"https://eprocure.gov.in/cppp/"},
+  {name:"KfW Development Bank", acr:"KfW · German co-financier", rel:"low", cats:["multilateral","added"], added:true,
+   what:"German financial cooperation, frequently co-financing TVET and infrastructure alongside GIZ. Tenders surface through its own notices and aggregators.",
+   why:"Lower cadence for pure skilling, but worth a passive alert where it co-finances vocational infrastructure you could build or operate. Keep as a watch-only line.",
+   meta:["Notice","Co-finance","Watch-only"], url:"https://www.tendersontime.com/kfw-tenders/"},
+  {name:"Sourcing aggregators", acr:"TendersOnTime · Tendersniper · Skillspedia", rel:"med", cats:["domestic","multilateral"],
+   what:"Consolidation layer that scrapes 4,000+ government sources plus funder portals into one skilling feed with EOI/RFP filters, value and deadline metadata.",
+   why:"Not a funder — the net that catches everything above in one place, and GIZ's actual publishing channel. Use one paid aggregator as your master feed, official portals to verify.",
+   meta:["Aggregator","Master feed","Verify on source"], url:"https://tendersniper.com/search/p/skill-development-training-tenders-india"}
+];
+
+const cardsEl = document.getElementById('cards');
+const relClass=r=>r==='high'?'high':r==='med'?'med':'low';
+const relTxt=r=>r==='high'?'High fit':r==='med'?'Medium':'Watch';
+FUNDERS.forEach(f=>{
+  const c=document.createElement('article');
+  c.className='card'; c.dataset.cats=f.cats.join(' ');
+  c.innerHTML=`<div class="card-top"><div><h3>${f.name}</h3><span class="acr">${f.acr}</span></div>
+    <span class="rel ${relClass(f.rel)}">${relTxt(f.rel)}</span></div>
+    ${f.added?'<span class="added">+ Added by Sift</span>':''}
+    <p class="what">${f.what}</p><p class="why">${f.why}</p>
+    <div class="card-meta">${f.meta.map(m=>`<span class="tag">${m}</span>`).join('')}</div>
+    <a class="go" href="${f.url}" target="_blank" rel="noopener">Open procurement page</a>`;
+  cardsEl.appendChild(c);
+});
+document.querySelectorAll('#filterbar .fbtn').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('#filterbar .fbtn').forEach(x=>x.setAttribute('aria-pressed','false'));
+  b.setAttribute('aria-pressed','true');
+  const f=b.dataset.f;
+  document.querySelectorAll('.card').forEach(c=>c.classList.toggle('hidden', !(f==='all'||c.dataset.cats.split(' ').includes(f))));
+}));
+
+/* ---------------- TABS ---------------- */
+const tabBtns=[...document.querySelectorAll('.tab')];
+const PANELS={'tab-feed':'p-feed','tab-eng':'p-eng','tab-live':'p-live'};
+tabBtns.forEach(t=>t.addEventListener('click',()=>{
+  tabBtns.forEach(x=>x.setAttribute('aria-selected','false'));
+  t.setAttribute('aria-selected','true');
+  Object.entries(PANELS).forEach(([tab,pan])=>document.getElementById(pan).dataset.active=(t.id===tab));
+}));
+
+/* ---------------- ENGINE ---------------- */
+const SECTORS=[
+  {id:'skill',t:'Core skill development',d:'VTP / NSQF-aligned training'},
+  {id:'hosp',t:'Hospitality',d:'F&B, front-office, housekeeping'},
+  {id:'nurse',t:'Nursing & caretaking',d:'GDA, care, SSW care corridor'},
+  {id:'japan',t:'Japanese language & skill',d:'TITP / SSW pre-departure'},
+  {id:'digi',t:'Digital marketing',d:'Performance, social, content'},
+  {id:'oil',t:'Oil & gas retail',d:'Forecourt, retail outlet ops'}
+];
+const MARKERS=['VTP','ASHA','ITI','TOT','EOI','SSC','SLA','RPL','NSQF','NSDC','NOS','SCVT','TEVT'];
+const DELIVER=[
+  {id:'train',t:'Trainers / faculty',d:'Certified TOT pool'},
+  {id:'infra',t:'Centres / infrastructure',d:'Labs, CoE, ASTI setup'},
+  {id:'pia',t:'End-to-end implementation',d:'PIA / mobilisation / placement'},
+  {id:'cons',t:'Consortium delivery',d:'Co-joint agencies alongside you'}
+];
+const state={firm:'firm',funder:3,nw:'none',cons:'yes',sectors:new Set(['skill']),markers:new Set(),deliver:new Set(['train']),turnover:false,debar:false};
+
+function buildOpts(arr,host,key){
+  const h=document.getElementById(host);
+  arr.forEach(o=>{
+    const l=document.createElement('label');
+    l.className='opt'+(state[key].has(o.id)?' checked':'');
+    l.innerHTML=`<input type="checkbox" ${state[key].has(o.id)?'checked':''}><span><span class="ot">${o.t}</span><span class="od">${o.d}</span></span>`;
+    l.querySelector('input').addEventListener('change',e=>{
+      e.target.checked?state[key].add(o.id):state[key].delete(o.id);
+      l.classList.toggle('checked',e.target.checked); score();
+    });
+    h.appendChild(l);
+  });
+}
+buildOpts(SECTORS,'sectors','sectors');
+buildOpts(DELIVER,'deliver','deliver');
+const mkHost=document.getElementById('markers');
+MARKERS.forEach(m=>{
+  const b=document.createElement('button');
+  b.className='mk'; b.type='button'; b.textContent=m; b.setAttribute('aria-pressed','false');
+  b.addEventListener('click',()=>{const on=b.getAttribute('aria-pressed')==='true';b.setAttribute('aria-pressed',String(!on));on?state.markers.delete(m):state.markers.add(m);score();});
+  mkHost.appendChild(b);
+});
+function seg(id,key,cast){
+  document.querySelectorAll('#'+id+' button').forEach(b=>b.addEventListener('click',()=>{
+    document.querySelectorAll('#'+id+' button').forEach(x=>x.setAttribute('aria-pressed','false'));
+    b.setAttribute('aria-pressed','true'); state[key]=cast?cast(b.dataset.v):b.dataset.v; score();
+  }));
+}
+seg('seg-firm','firm'); seg('seg-funder','funder',v=>+v); seg('seg-nw','nw'); seg('seg-cons','cons');
+['turnover','debar'].forEach(k=>document.getElementById('t-'+k).addEventListener('change',e=>{
+  state[k]=e.target.checked; e.target.closest('.opt').classList.toggle('checked',e.target.checked); score();
+}));
+document.getElementById('reset').addEventListener('click',()=>location.reload());
+
+function score(){
+  let sct=0;
+  if(state.sectors.has('skill')) sct+=12;
+  const extras=[...state.sectors].filter(s=>s!=='skill').length;
+  sct+=Math.min(extras*5,18); sct=Math.min(sct,30);
+  const mrk=Math.min(Math.round(state.markers.size*2.2),20);
+  const fnd={3:20,2:14,1:8}[state.funder];
+  let dlv=0;const dw={train:4,infra:4,pia:5,cons:2};state.deliver.forEach(d=>dlv+=dw[d]||0);dlv=Math.min(dlv,15);
+  let fin=0;
+  if(state.nw==='none')fin=15;
+  else if(state.nw==='agg')fin=state.cons==='yes'?13:4;
+  else if(state.nw==='floor')fin=2;
+  if(state.turnover)fin=Math.max(fin-7,0);
+  let total=sct+mrk+fnd+dlv+fin;
+
+  const gates=[];let hardStop=false;
+  if(state.firm==='individual'){hardStop=true;gates.push(['stop','Individuals-only invitation — you bid as a firm. Outside scope.']);}
+  if(state.debar){hardStop=true;gates.push(['stop','Debarment / blacklist declared — automatically extends to all consortium partners.']);}
+  if(state.nw==='floor'&&state.cons==='no'){hardStop=true;gates.push(['stop','Individual positive net-worth floor with sole-bidder-only — negative net worth cannot clear it. Hard stop.']);}
+  if(state.turnover&&state.cons==='no'){hardStop=true;gates.push(['stop','Turnover ask exceeds your top line and no consortium aggregation permitted.']);}
+  if(state.nw==='floor'&&state.cons==='yes')gates.push(['warn','Individual net-worth floor — you can only enter as a junior/technical partner; a positive-net-worth firm must lead and may need 60–75% of the threshold itself.']);
+  if(state.nw==='agg'&&state.cons==='yes')gates.push(['ok','Net worth aggregated across the consortium — a positive-net-worth lead can carry your negative balance. Best-case financial structure.']);
+  if(state.nw==='none')gates.push(['ok','No net-worth clause — your structural weakness is irrelevant here; compete on turnover, experience and technical merit.']);
+  if(state.funder===3)gates.push(['ok','High-paying funder tier — worth real bid effort even at moderate fit.']);
+  if(!state.sectors.has('skill')&&state.sectors.size>0)gates.push(['warn','Core skilling not ticked — confirm the tender is genuinely a training mandate, not adjacent procurement.']);
+  if(state.markers.size<=2)gates.push(['warn','Few ecosystem markers detected — may not be a firm-grade TVET tender. Re-read the scope.']);
+  if(state.firm==='either')gates.push(['warn','Open to individuals too — expect a wider, less firm-shaped field.']);
+  if(state.sectors.has('japan')&&state.funder>=2)gates.push(['ok','Japan corridor + JICA/NSDC/state funder — TITP/SSW Sending-Organisation territory. Strong strategic adjacency.']);
+  if(hardStop)total=Math.min(total,28);
+
+  let band,verd,sub,cls;
+  if(hardStop){band='no';verd='NO-GO';sub='fails an eligibility gate';cls='no';}
+  else if(total>=75){band='go';verd='STRONG GO';sub='pursue — strong relevance';cls='go';}
+  else if(total>=60){band='go';verd='CONDITIONAL GO';sub='pursue, structure carefully';cls='go';}
+  else if(total>=45){band='cau';verd='CAUTION';sub='clarify before committing';cls='cau';}
+  else{band='no';verd='NO-GO';sub='low relevance — pass';cls='no';}
+
+  const clar=[];
+  if(state.nw==='agg'||state.nw==='floor')clar.push('Confirm whether net worth is aggregated across consortium members or applied as an individual floor — and the minimum the lead member must hold.');
+  if(state.nw!=='none')clar.push('Is a banker\u2019s solvency certificate required in addition to the CA net-worth certificate? Negative net worth may still draw a solvency challenge.');
+  if(state.cons==='yes')clar.push('Maximum number of consortium members permitted, and the minimum experience/turnover share the lead partner must carry?');
+  if(state.turnover)clar.push('Can the average annual turnover requirement be met by adding members\u2019 turnover, or must the lead alone qualify?');
+  if(state.markers.has('RPL')||state.sectors.size>1)clar.push('Are target numbers, NSQF levels and placement obligations defined per sector, and is RPL counted toward deliverables?');
+  if(state.sectors.has('japan'))clar.push('For the Japan corridor: is JLPT/JFT-Basic language outcome a deliverable, and who owns placement liability post-deployment?');
+  if(clar.length===0)clar.push('No structural ambiguities flagged — verify EMD, bid validity and submission mode before drafting.');
+
+  const secNames=[...state.sectors].map(s=>SECTORS.find(x=>x.id===s)?.t).filter(Boolean);
+  let syn;
+  if(hardStop){syn=`<b>Pass.</b> The tender is otherwise ${total>=20?'a partial':'a weak'} fit, but it trips an eligibility gate this firm\u2019s profile cannot clear — redirect the effort to an aggregated or no-net-worth opportunity.`;}
+  else{
+    const ftier={3:'a high-paying funder',2:'the domestic skilling stack',1:'a price-led buyer'}[state.funder];
+    const finline=state.nw==='none'?'with no net-worth barrier to your structure':state.nw==='agg'?'survivable financially only if a positive-net-worth partner leads the consortium':'financially marginal — you can join only as a junior partner';
+    syn=`<b>${verd}.</b> A ${secNames.length?secNames.join(' / ').toLowerCase():'skilling'} mandate from ${ftier}, ${finline}. Relevance scores ${total}/100${total>=60?' — worth a structured bid':total>=45?' — clarify the open questions first':' — relevance too thin to justify the effort'}.`;
+  }
+
+  document.getElementById('vpct').textContent=total+'%';
+  const vverd=document.getElementById('vverd');vverd.firstChild.nodeValue=verd;vverd.className='v-verd '+cls;
+  document.getElementById('vsub').textContent=sub;
+  document.getElementById('vband').className='v-band '+(band==='go'?'go':band==='cau'?'cau':'no');
+  const meter=document.getElementById('vmeter');meter.style.width=Math.max(total,3)+'%';meter.className=cls;
+  const bars={sct:[sct,30],mrk:[mrk,20],fnd:[fnd,20],dlv:[dlv,15],fin:[fin,15]};
+  Object.entries(bars).forEach(([k,[v,m]])=>{document.getElementById('b-'+k).style.width=(v/m*100)+'%';document.getElementById('v-'+k).textContent=v+'/'+m;});
+  document.getElementById('flags').innerHTML=gates.length?gates.map(([t,txt])=>{const ic=t==='stop'?'✕':t==='ok'?'✓':'!';return `<li class="flag ${t}"><span class="ic">${ic}</span><span>${txt}</span></li>`;}).join(''):'<li class="empty">No flags.</li>';
+  document.getElementById('clar').innerHTML=clar.map(c=>`<li>${c}</li>`).join('');
+  const synEl=document.getElementById('syn');synEl.innerHTML=syn;synEl.classList.remove('empty');
+}
+score();
+
+/* ---------------- LIVE WIRE ---------------- */
+const PRESETS=[
+  "JICA TITP sending organisation RFP 2026",
+  "PMKVY 4.0 PIA empanelment EOI",
+  "Training provider empanelment skill development EOI",
+  "Nursing GDA caretaking skilling tender India",
+  "Hospitality skill development EOI state mission",
+  "ADB World Bank skills consulting EOI India 2026"
+];
+const presetHost=document.getElementById('presets');
+PRESETS.forEach(p=>{
+  const b=document.createElement('button');
+  b.className='preset';b.type='button';b.textContent=p;
+  b.addEventListener('click',()=>{document.getElementById('q').value=p;doSearch();});
+  presetHost.appendChild(b);
+});
+
+const qEl=document.getElementById('q'), btn=document.getElementById('searchBtn'),
+      statusEl=document.getElementById('status'), resHost=document.getElementById('liveResults');
+
+if(location.protocol==='file:'){
+  document.getElementById('modeNote').innerHTML='You\u2019ve opened this file directly from disk, so the live API call can\u2019t run here. <b>Open it in the Claude artifact view to search live</b>, or deploy it with the <code>search.js</code> serverless function and set <code>LIVE.mode = "proxy"</code>.';
+}
+
+function buildPrompt(q){
+  return 'You are a tender-sourcing analyst for an Indian skill-development (TVET) implementation firm. The firm bids as a company (not an individual), offers trainers, training infrastructure and end-to-end implementation, and is open to consortia. '
+  +'Use web search to find CURRENT or recent (2025-2026) live tenders, EOIs or RFPs matching this query: "'+q+'". '
+  +'Prioritise firm-based opportunities from NSDC/MSDE, state skill missions, JICA (TITP/SSW sending organisation), GIZ, ADB, the World Bank, GeM and central ministries. '
+  +'Respond with ONLY a JSON array, no markdown fences and no preamble, maximum 6 items. '
+  +'Each item must be an object with exactly these keys: "title", "authority", "type", "deadline", "url", "note". '
+  +'"type" is one of EOI, RFP or Tender. "deadline" is the submission date if stated, else "—". '
+  +'"note" is a single short sentence on why it is or is not relevant to this firm. If nothing current is found, return an empty array [].';
+}
+
+async function runDirect(q){
+  const r=await fetch("https://api.anthropic.com/v1/messages",{
+    method:"POST", headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      model:LIVE.model, max_tokens:1000,
+      messages:[{role:"user",content:buildPrompt(q)}],
+      tools:[{type:"web_search_20250305",name:"web_search"}]
+    })
+  });
+  if(!r.ok) throw new Error("API "+r.status);
+  const data=await r.json();
+  const text=(data.content||[]).filter(b=>b.type==="text").map(b=>b.text).join("\n");
+  return parseJSON(text);
+}
+async function runProxy(q){
+  const r=await fetch(LIVE.proxyUrl,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({query:q})});
+  if(!r.ok) throw new Error("Backend "+r.status);
+  const d=await r.json();
+  if(Array.isArray(d.results)) return d.results;
+  if(typeof d.results==="string") return parseJSON(d.results);
+  return [];
+}
+function parseJSON(text){
+  const c=text.replace(/```json|```/g,"");
+  const s=c.indexOf("["), e=c.lastIndexOf("]");
+  if(s<0||e<0) throw new Error("No structured results returned.");
+  return JSON.parse(c.slice(s,e+1));
+}
+
+function skeletons(n){resHost.innerHTML=Array.from({length:n}).map(()=>'<div class="skel"><span></span><span></span><span></span><span></span></div>').join('');}
+function esc(s){return String(s==null?'':s).replace(/[<>&]/g,m=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[m]));}
+function typeClass(t){t=(t||'').toLowerCase();return t.includes('eoi')?'eoi':t.includes('rfp')?'rfp':'tender';}
+function renderResults(items){
+  if(!items||!items.length){resHost.innerHTML='';statusEl.className='status';statusEl.textContent='No current results parsed. Try a broader query or a specific funder name.';return;}
+  resHost.innerHTML=items.map(it=>{
+    const safeUrl=(it.url&&/^https?:\/\//.test(it.url))?it.url:null;
+    const dl=(it.deadline&&it.deadline!=='—')?`<span class="dl">Closes <b>${esc(it.deadline)}</b></span>`:`<span class="dl">Deadline —</span>`;
+    return `<article class="lr">
+      <div class="lr-top"><span class="ttype ${typeClass(it.type)}">${esc(it.type||'Tender')}</span>${dl}</div>
+      <h3>${esc(it.title||'Untitled opportunity')}</h3>
+      <p class="auth">${esc(it.authority||'Authority not stated')}</p>
+      ${it.note?`<p class="lnote">${esc(it.note)}</p>`:''}
+      ${safeUrl?`<a class="src" href="${safeUrl}" target="_blank" rel="noopener">Verify on source</a>`:`<span class="auth" style="font-style:italic">No direct link returned — search the authority\u2019s portal</span>`}
+    </article>`;
+  }).join('');
+  statusEl.className='status ok';statusEl.textContent=`${items.length} lead${items.length>1?'s':''} found · verify each on the source page.`;
+}
+
+async function doSearch(){
+  const q=qEl.value.trim();
+  if(!q){qEl.focus();return;}
+  btn.disabled=true;
+  statusEl.className='status';statusEl.innerHTML='<span class="dot"></span>Searching the wire for live tenders…';
+  skeletons(4);
+  try{
+    const items = LIVE.mode==='proxy' ? await runProxy(q) : await runDirect(q);
+    renderResults(items);
+  }catch(err){
+    resHost.innerHTML='';
+    statusEl.className='status err';
+    const hint = LIVE.mode==='direct'
+      ? 'Live search failed. In the Claude artifact view this should work; if you\u2019ve deployed this file, set LIVE.mode = "proxy" and add the search.js backend. ('+esc(err.message)+')'
+      : 'Backend call failed — check that search.js is deployed and ANTHROPIC_API_KEY is set. ('+esc(err.message)+')';
+    statusEl.textContent=hint;
+  }finally{ btn.disabled=false; }
+}
+btn.addEventListener('click',doSearch);
+qEl.addEventListener('keydown',e=>{if(e.key==='Enter')doSearch();});
+</script>
+</body>
+</html>
