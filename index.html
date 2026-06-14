@@ -6,7 +6,7 @@
 <title>Sift — Tender Relevance Engine</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;450;500;600&family=Space+Mono:wght@400;700&family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;450;500;600&family=Space+Mono:wght@400;700&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --paper:#FBFAF7; --ink:#181613; --muted:#6B6A64; --faint:#9A988F;
@@ -15,7 +15,7 @@
     --go:#2F7A57; --go-bg:#E9F2EC;
     --cau:#B97D14; --cau-bg:#F8EFD9;
     --no:#A8362B; --no-bg:#F6E5E2;
-    --disp:"Space Grotesk",sans-serif; --body:"Inter",sans-serif; --mono:"Space Mono",monospace; --script:"Dancing Script",cursive;
+    --disp:"Space Grotesk",sans-serif; --body:"Inter",sans-serif; --mono:"Space Mono",monospace; --script:"Caveat",cursive;
   }
   *{box-sizing:border-box}
   html{-webkit-text-size-adjust:100%}
@@ -28,7 +28,7 @@
   header.top{border-bottom:1px solid var(--hair);background:var(--paper);position:sticky;top:0;z-index:30}
   .top-inner{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 24px;max-width:1080px;margin:0 auto;flex-wrap:wrap}
   .brand{display:flex;align-items:flex-end;gap:13px}
-  .mark{font-family:var(--script);font-weight:700;font-size:36px;letter-spacing:.01em;position:relative;line-height:.85}
+  .mark{font-family:var(--script);font-weight:700;font-size:40px;letter-spacing:.005em;position:relative;line-height:.8}
   .mark .hl{background:linear-gradient(180deg,transparent 74%,var(--hi-soft) 74%);padding:0 7px}
   .brand .sub{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding-bottom:6px}
   .profile{display:flex;gap:10px;flex-wrap:wrap}
@@ -189,6 +189,41 @@
   .skel span{display:block;height:11px;border-radius:3px;background:linear-gradient(90deg,#EFEDE5 25%,#F6F4EE 50%,#EFEDE5 75%);background-size:200% 100%;animation:sh 1.3s infinite}
   .skel span:nth-child(1){width:30%;height:9px}.skel span:nth-child(2){width:85%;height:14px}.skel span:nth-child(3){width:55%}.skel span:nth-child(4){width:95%}
   @keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
+  /* ---- strainer ---- */
+  .searchrow select{font-family:var(--body);font-size:14px;border:1px solid var(--hair);background:var(--panel);
+    border-radius:3px;padding:13px 14px;color:var(--ink);min-width:215px;cursor:pointer}
+  .searchrow select:focus{outline:2px solid var(--ink);outline-offset:-1px;border-color:var(--ink)}
+  .tagbar{display:flex;gap:6px;flex-wrap:wrap;margin:2px 0 18px;align-items:center}
+  .tagbar .tlbl{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin-right:4px}
+  .tchip{font-family:var(--mono);font-size:10.5px;letter-spacing:.03em;border:1px solid var(--hair);background:var(--panel);
+    color:var(--muted);padding:5px 10px;border-radius:99px;cursor:pointer}
+  .tchip[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+  .tchip:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+  .tchip .c{opacity:.55;margin-left:5px}
+  .copybar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:0 0 14px;flex-wrap:wrap}
+  .copybar:empty{margin:0}
+  .copybtn{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--hair);
+    background:var(--panel);color:var(--ink);padding:8px 13px;border-radius:2px;cursor:pointer}
+  .copybtn:hover{background:var(--hi-wash);border-color:var(--ink)}
+  .copybar .cnt{font-family:var(--mono);font-size:11px;color:var(--muted)}
+  .lr .fit{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;font-weight:700;text-transform:uppercase;padding:4px 8px;border-radius:2px;white-space:nowrap}
+  .lr .fit.fit-fit{background:var(--go-bg);color:var(--go)}
+  .lr .fit.fit-mid{background:var(--cau-bg);color:var(--cau)}
+  .lr .fit.fit-not{background:#EEEDE7;color:var(--muted)}
+  .lr-tags{display:flex;flex-wrap:wrap;gap:5px}
+  .lr-tags .t{font-family:var(--mono);font-size:9.5px;letter-spacing:.03em;color:var(--muted);border:1px solid var(--hair);padding:2px 6px;border-radius:2px;background:var(--paper)}
+  .lr.hidden{display:none}
+  .lr .srcname{font-family:var(--mono);font-size:10px;color:var(--faint);letter-spacing:.04em}
+  .lr-foot{margin-top:auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding-top:2px}
+  .lr-foot .src{margin-top:0}
+  .bridge{font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;border:1px solid var(--ink);background:var(--ink);color:var(--paper);padding:7px 11px;border-radius:2px;cursor:pointer}
+  .bridge:hover{background:#000}
+  .bridge:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+  .prefill{display:none;border:1px solid var(--hair);border-left:3px solid var(--hi);background:#FCFBF6;border-radius:3px;padding:13px 15px;margin-bottom:22px;font-size:12.5px;line-height:1.5;color:#332f29}
+  .prefill.show{display:block}
+  .prefill .ttl{font-family:var(--mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px}
+  .prefill b{font-weight:600;color:var(--ink)}
+  .prefill .x{float:right;cursor:pointer;color:var(--faint);font-family:var(--mono);font-size:15px;border:none;background:none;line-height:1;padding:0 0 0 10px}
 
   footer{border-top:1px solid var(--hair);padding:22px 0 40px;color:var(--faint);font-size:11.5px;line-height:1.6}
   footer b{color:var(--muted)}
@@ -223,7 +258,7 @@
     <div class="tabs" role="tablist">
       <button class="tab" role="tab" id="tab-feed" aria-selected="true" aria-controls="p-feed"><span class="n">01</span>Funder Feed</button>
       <button class="tab" role="tab" id="tab-eng" aria-selected="false" aria-controls="p-eng"><span class="n">02</span>Triage Engine</button>
-      <button class="tab" role="tab" id="tab-live" aria-selected="false" aria-controls="p-live"><span class="n">03</span>Live Wire<span class="live-dot"></span></button>
+      <button class="tab" role="tab" id="tab-live" aria-selected="false" aria-controls="p-live"><span class="n">03</span>Strainer<span class="live-dot"></span></button>
     </div>
   </section>
 
@@ -254,6 +289,7 @@
     </div>
     <div class="eng-grid">
       <div class="form-col">
+        <div class="prefill" id="prefillNote"></div>
         <div class="form-sec">
           <div class="lab"><span>Bidder type the tender invites</span><span class="qn">gate</span></div>
           <div class="seg" id="seg-firm" role="group" aria-label="Bidder type">
@@ -330,24 +366,26 @@
     </div>
   </section>
 
-  <!-- ===================== TAB 3 : LIVE WIRE ===================== -->
+  <!-- ===================== TAB 3 : STRAINER ===================== -->
   <section class="panel" id="p-live" role="tabpanel" data-active="false" aria-labelledby="tab-live">
     <div class="eng-head">
-      <h2>Live Wire — search the open market</h2>
-      <p>Run a real web search for current EOIs, RFPs and tenders across the skilling funders. Results come back parsed: authority, type, deadline, source link, and a one-line relevance read tuned to this firm's profile.</p>
+      <h2>The Strainer — every source, one page</h2>
+      <p>Pick a procurement source — or strain them <b>all</b> at once. Sift pulls the live tenders, pools their links onto this page, and brands each one <b>Fit</b>, <b>Mid</b> or <b>Not</b> with the relevance factor behind the tag. Then filter the catch by topic — TVET, PIA, JICA, Hospitality and the rest.</p>
     </div>
 
     <div class="live-note">
       <span class="b">Where it runs</span>
-      <div id="modeNote">Live search calls Claude's API with web search enabled. <b>Inside the Claude artifact view it works as-is.</b> On your deployed (Vercel) build, flip <code>LIVE.mode</code> to <code>"proxy"</code> in the script and drop in the <code>search.js</code> serverless function — a browser can't hold your API key directly.</div>
+      <div id="modeNote"><b>Deploy-ready.</b> Live search routes through a serverless function (<code>api/search.js</code>) that keeps your API key server-side. Host the page and the function together on <b>Vercel</b> (leave <code>apiBase</code> blank), or host the page on <b>GitHub Pages</b> and set <code>apiBase</code> to your Vercel URL — Sift auto-detects which. The included <code>README.md</code> has the 3-step setup.</div>
     </div>
 
     <div class="searchrow">
-      <input id="q" type="text" placeholder="e.g. JICA TITP sending organisation RFP 2026" aria-label="Search query">
-      <button id="searchBtn">Search the wire</button>
+      <select id="src" aria-label="Procurement source"></select>
+      <input id="q" type="text" placeholder="Optional — narrow it (e.g. nursing, Tamil Nadu, JLPT)" aria-label="Optional keyword refine">
+      <button id="searchBtn">Strain</button>
     </div>
-    <div class="presets" id="presets"></div>
     <div class="status" id="status" aria-live="polite"></div>
+    <div class="tagbar" id="tagbar"></div>
+    <div class="copybar" id="copybar"></div>
     <div class="live-results" id="liveResults"></div>
   </section>
 
@@ -360,10 +398,27 @@
 <script>
 /* ================= CONFIG ================= */
 const LIVE = {
-  mode:  "direct",          // "direct" = Claude artifact view (key handled for you) | "proxy" = your deployed serverless backend
-  proxyUrl: "/api/search",  // your Vercel function endpoint (see search.js) — used when mode === "proxy"
-  model: "claude-sonnet-4-6"
+  // ── Deployment ───────────────────────────────────────────────────────
+  // Live search runs through a serverless function (api/search.js) that holds
+  // your Anthropic key, so the browser never sees it. Point Sift at it:
+  //   • Page + API together on Vercel       -> leave apiBase = "" (same origin)
+  //   • Page on GitHub Pages, API on Vercel -> set apiBase to your Vercel URL
+  apiBase: "",                     // e.g. "https://sift-xxxx.vercel.app"
+  model:   "claude-sonnet-4-6",
+  mode:    "auto"                  // "auto" (recommended) | "proxy" | "direct"
 };
+// Decide how to reach the model from wherever this page is being served.
+function liveMode(){
+  if(LIVE.mode!=="auto") return LIVE.mode;
+  if((LIVE.apiBase||"").trim()) return "proxy";                 // a backend is configured
+  const h=location.hostname||"";
+  if(/(\.vercel\.app|\.github\.io)$/i.test(h)) return "proxy"; // deployed host
+  return "direct";                                              // Claude preview / local
+}
+function proxyEndpoint(){
+  const base=(LIVE.apiBase||"").replace(/\/+$/,"");
+  return base ? base+"/api/search" : "/api/search";
+}
 
 /* ---------------- FEED DATA ---------------- */
 const FUNDERS = [
@@ -563,48 +618,52 @@ function score(){
 }
 score();
 
-/* ---------------- LIVE WIRE ---------------- */
-const PRESETS=[
-  "JICA TITP sending organisation RFP 2026",
-  "PMKVY 4.0 PIA empanelment EOI",
-  "Training provider empanelment skill development EOI",
-  "Nursing GDA caretaking skilling tender India",
-  "Hospitality skill development EOI state mission",
-  "ADB World Bank skills consulting EOI India 2026"
+/* ---------------- STRAINER ---------------- */
+const SOURCES=[
+  {v:'all',  label:'All sources', n:10, q:'across NSDC and MSDE, Indian state skill development missions, JICA-ODA TITP/SSW sending-organisation programmes, GIZ India, the Asian Development Bank, the World Bank, GeM and central ministries'},
+  {v:'nsdc', label:'NSDC / MSDE', n:7,  q:'NSDC and MSDE \u2014 active tenders, TITP sending-organisation empanelment and PMKVY 4.0 PIA EOIs'},
+  {v:'state',label:'State skill missions', n:8, q:'Indian state skill development missions and Kaushal Nigams \u2014 training-partner and VTP empanelment EOIs and PMKVY / DDU-GKY state components'},
+  {v:'jica', label:'JICA \u00b7 TITP / SSW', n:7, q:'JICA-ODA funded Technical Intern Training Programme (TITP) and Specified Skilled Worker (SSW) sending-organisation RFPs and EOIs in India'},
+  {v:'giz',  label:'GIZ India', n:6, q:'GIZ India vocational training and TVET RFPs, published via TendersOnTime'},
+  {v:'adb',  label:'Asian Development Bank', n:6, q:'Asian Development Bank (ADB) skills and human-resource-development consulting EOIs in India'},
+  {v:'wb',   label:'World Bank', n:6, q:'World Bank financed skilling operations in India such as SANKALP and STRIVE \u2014 REOIs and consulting EOIs'},
+  {v:'gem',  label:'GeM', n:6, q:'Government e-Marketplace (GeM) training and skilling service bids'},
+  {v:'cppp', label:'Central Public Procurement', n:6, q:'the Central Public Procurement Portal \u2014 central-ministry skilling and training EOIs and RFPs'},
+  {v:'ungm', label:'UN agencies (UNGM)', n:6, q:'UN agencies (UNDP, UNICEF, ILO) skilling, livelihood and employability RFPs in India'}
 ];
-const presetHost=document.getElementById('presets');
-PRESETS.forEach(p=>{
-  const b=document.createElement('button');
-  b.className='preset';b.type='button';b.textContent=p;
-  b.addEventListener('click',()=>{document.getElementById('q').value=p;doSearch();});
-  presetHost.appendChild(b);
-});
+const srcEl=document.getElementById('src');
+SOURCES.forEach(o=>{const op=document.createElement('option');op.value=o.v;op.textContent=o.label;srcEl.appendChild(op);});
 
 const qEl=document.getElementById('q'), btn=document.getElementById('searchBtn'),
-      statusEl=document.getElementById('status'), resHost=document.getElementById('liveResults');
+      statusEl=document.getElementById('status'), resHost=document.getElementById('liveResults'),
+      tagbar=document.getElementById('tagbar'), copybar=document.getElementById('copybar');
+let LAST=[];
 
 if(location.protocol==='file:'){
-  document.getElementById('modeNote').innerHTML='You\u2019ve opened this file directly from disk, so the live API call can\u2019t run here. <b>Open it in the Claude artifact view to search live</b>, or deploy it with the <code>search.js</code> serverless function and set <code>LIVE.mode = "proxy"</code>.';
+  document.getElementById('modeNote').innerHTML='You\u2019ve opened this file straight from disk, so live search can\u2019t run here. <b>Deploy it</b> \u2014 push to Vercel (page + <code>api/search.js</code>), or to GitHub Pages with <code>apiBase</code> set to your Vercel URL. See <code>README.md</code>.';
 }
 
-function buildPrompt(q){
-  return 'You are a tender-sourcing analyst for an Indian skill-development (TVET) implementation firm. The firm bids as a company (not an individual), offers trainers, training infrastructure and end-to-end implementation, and is open to consortia. '
-  +'Use web search to find CURRENT or recent (2025-2026) live tenders, EOIs or RFPs matching this query: "'+q+'". '
-  +'Prioritise firm-based opportunities from NSDC/MSDE, state skill missions, JICA (TITP/SSW sending organisation), GIZ, ADB, the World Bank, GeM and central ministries. '
-  +'Respond with ONLY a JSON array, no markdown fences and no preamble, maximum 6 items. '
-  +'Each item must be an object with exactly these keys: "title", "authority", "type", "deadline", "url", "note". '
-  +'"type" is one of EOI, RFP or Tender. "deadline" is the submission date if stated, else "—". '
-  +'"note" is a single short sentence on why it is or is not relevant to this firm. If nothing current is found, return an empty array [].';
+function buildPrompt(q,n){
+  return 'You are the strainer for Sift, a tender-triage tool for an Indian skill-development (TVET) implementation firm. '
+  +'The firm BIDS AS A COMPANY (not an individual), offers trainers, training infrastructure and end-to-end implementation (PIA role), is open to consortia, has 100 Cr+ revenue but a NEGATIVE net worth, and works across these sectors: skill development, hospitality, nursing & caretaking, digital marketing, oil & gas retail, and Japanese language / TITP-SSW. '
+  +'Use web search to strain CURRENT or recent (2025-2026) FIRM-BASED tenders, EOIs and RFPs from '+q+'. '
+  +'For each opportunity, judge its fit from THIS firm\'s lens. '
+  +'Respond with ONLY a JSON array, no markdown fences and no preamble, maximum '+n+' items. '
+  +'Each item must be an object with exactly these keys: "title","authority","source","type","deadline","url","fit","reason","tags". '
+  +'"source" is a short name of the funder or portal it came from. '
+  +'"type" is one of EOI, RFP or Tender. "deadline" is the submission date if stated, else "\u2014". '
+  +'"fit" is exactly one of "Fit", "Mid" or "Not" \u2014 Fit = firm-based and squarely in one of the firm\'s sectors with feasible eligibility; Mid = partial sector match, or eligibility / commoditisation doubt; Not = individual-only, out of sector, or clearly disqualifying. '
+  +'"reason" is ONE short sentence naming the single biggest factor behind that fit tag (the relevance factor). '
+  +'"tags" is an array drawn ONLY from this set: ["TVET","Skill Dev","PIA","VTP","EOI","RFP","RPL","NSQF","NSDC","TITP/SSW","JICA","Hospitality","Nursing","Digital","Oil & Gas","Japanese","Consortium","Multilateral","State","Central"]. '
+  +'If nothing current is found, return an empty array [].';
 }
 
-async function runDirect(q){
+async function runDirect(q,n){
   const r=await fetch("https://api.anthropic.com/v1/messages",{
     method:"POST", headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({
-      model:LIVE.model, max_tokens:1000,
-      messages:[{role:"user",content:buildPrompt(q)}],
-      tools:[{type:"web_search_20250305",name:"web_search"}]
-    })
+    body:JSON.stringify({model:LIVE.model, max_tokens:1600,
+      messages:[{role:"user",content:buildPrompt(q,n)}],
+      tools:[{type:"web_search_20250305",name:"web_search"}]})
   });
   if(!r.ok) throw new Error("API "+r.status);
   const data=await r.json();
@@ -612,7 +671,7 @@ async function runDirect(q){
   return parseJSON(text);
 }
 async function runProxy(q){
-  const r=await fetch(LIVE.proxyUrl,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({query:q})});
+  const r=await fetch(proxyEndpoint(),{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({query:q})});
   if(!r.ok) throw new Error("Backend "+r.status);
   const d=await r.json();
   if(Array.isArray(d.results)) return d.results;
@@ -629,42 +688,127 @@ function parseJSON(text){
 function skeletons(n){resHost.innerHTML=Array.from({length:n}).map(()=>'<div class="skel"><span></span><span></span><span></span><span></span></div>').join('');}
 function esc(s){return String(s==null?'':s).replace(/[<>&]/g,m=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[m]));}
 function typeClass(t){t=(t||'').toLowerCase();return t.includes('eoi')?'eoi':t.includes('rfp')?'rfp':'tender';}
-function renderResults(items){
-  if(!items||!items.length){resHost.innerHTML='';statusEl.className='status';statusEl.textContent='No current results parsed. Try a broader query or a specific funder name.';return;}
-  resHost.innerHTML=items.map(it=>{
-    const safeUrl=(it.url&&/^https?:\/\//.test(it.url))?it.url:null;
-    const dl=(it.deadline&&it.deadline!=='—')?`<span class="dl">Closes <b>${esc(it.deadline)}</b></span>`:`<span class="dl">Deadline —</span>`;
-    return `<article class="lr">
-      <div class="lr-top"><span class="ttype ${typeClass(it.type)}">${esc(it.type||'Tender')}</span>${dl}</div>
-      <h3>${esc(it.title||'Untitled opportunity')}</h3>
-      <p class="auth">${esc(it.authority||'Authority not stated')}</p>
-      ${it.note?`<p class="lnote">${esc(it.note)}</p>`:''}
-      ${safeUrl?`<a class="src" href="${safeUrl}" target="_blank" rel="noopener">Verify on source</a>`:`<span class="auth" style="font-style:italic">No direct link returned — search the authority\u2019s portal</span>`}
-    </article>`;
-  }).join('');
-  statusEl.className='status ok';statusEl.textContent=`${items.length} lead${items.length>1?'s':''} found · verify each on the source page.`;
+function fitClass(f){f=(f||'').toLowerCase();return f.startsWith('fit')?'fit-fit':f.startsWith('mid')?'fit-mid':'fit-not';}
+function fitLabel(f){f=(f||'').toLowerCase();return f.startsWith('fit')?'Fit':f.startsWith('mid')?'Mid':'Not';}
+
+function cardHTML(it,idx){
+  const safeUrl=(it.url&&/^https?:\/\//.test(it.url))?it.url:null;
+  const dl=(it.deadline&&it.deadline!=='\u2014')?`<span class="dl">Closes <b>${esc(it.deadline)}</b></span>`:`<span class="dl">Deadline \u2014</span>`;
+  const tags=Array.isArray(it.tags)?it.tags:[];
+  const tagHTML=tags.length?`<div class="lr-tags">${tags.map(t=>`<span class="t">${esc(t)}</span>`).join('')}</div>`:'';
+  const src=it.source?`<span class="srcname"> \u00b7 ${esc(it.source)}</span>`:'';
+  const fl=fitLabel(it.fit);
+  const linkHTML=safeUrl?`<a class="src" href="${safeUrl}" target="_blank" rel="noopener">Open the link</a>`:`<span class="auth" style="font-style:italic">No direct link \u2014 search the authority\u2019s portal</span>`;
+  const bridge=(fl==='Fit'||fl==='Mid')?`<button class="bridge" data-i="${idx}">Score in Triage \u2192</button>`:'';
+  return `<article class="lr" data-tags="${esc(tags.join('|'))}" data-url="${safeUrl||''}">
+    <div class="lr-top"><span class="fit ${fitClass(it.fit)}">${fl}</span>
+      <span class="ttype ${typeClass(it.type)}">${esc(it.type||'Tender')}</span>${dl}</div>
+    <h3>${esc(it.title||'Untitled opportunity')}</h3>
+    <p class="auth">${esc(it.authority||'Authority not stated')}${src}</p>
+    ${it.reason?`<p class="lnote">${esc(it.reason)}</p>`:''}
+    ${tagHTML}
+    <div class="lr-foot">${linkHTML}${bridge}</div>
+  </article>`;
 }
 
-async function doSearch(){
-  const q=qEl.value.trim();
-  if(!q){qEl.focus();return;}
-  btn.disabled=true;
-  statusEl.className='status';statusEl.innerHTML='<span class="dot"></span>Searching the wire for live tenders…';
-  skeletons(4);
+function buildTagbar(items){
+  const counts={};
+  items.forEach(it=>(Array.isArray(it.tags)?it.tags:[]).forEach(t=>counts[t]=(counts[t]||0)+1));
+  const tags=Object.keys(counts).sort((a,b)=>counts[b]-counts[a]);
+  if(!tags.length){tagbar.innerHTML='';return;}
+  tagbar.innerHTML='<span class="tlbl">Filter</span>'
+    +`<button class="tchip" data-tag="__all" aria-pressed="true">All<span class="c">${items.length}</span></button>`
+    +tags.map(t=>`<button class="tchip" data-tag="${esc(t)}" aria-pressed="false">${esc(t)}<span class="c">${counts[t]}</span></button>`).join('');
+  tagbar.querySelectorAll('.tchip').forEach(c=>c.addEventListener('click',()=>{
+    tagbar.querySelectorAll('.tchip').forEach(x=>x.setAttribute('aria-pressed','false'));
+    c.setAttribute('aria-pressed','true');
+    const tag=c.dataset.tag;
+    document.querySelectorAll('.lr').forEach(card=>{
+      const show = tag==='__all' || (card.dataset.tags||'').split('|').includes(tag);
+      card.classList.toggle('hidden',!show);
+    });
+    updateCopybar();
+  }));
+}
+
+function visibleCards(){return [...document.querySelectorAll('.lr')].filter(c=>!c.classList.contains('hidden'));}
+function updateCopybar(){
+  const cards=visibleCards();
+  const links=cards.map(c=>c.dataset.url).filter(Boolean);
+  copybar.innerHTML = links.length
+    ? `<button class="copybtn" id="copyBtn">Copy ${links.length} link${links.length>1?'s':''}</button><span class="cnt" id="copyCnt">${cards.length} shown</span>`
+    : '';
+  const cb=document.getElementById('copyBtn');
+  if(cb) cb.addEventListener('click',async()=>{
+    try{ await navigator.clipboard.writeText(links.join('\n')); document.getElementById('copyCnt').textContent='Copied to clipboard'; }
+    catch(_){ document.getElementById('copyCnt').textContent='Copy blocked \u2014 select manually'; }
+  });
+}
+
+function render(items){
+  LAST=items||[];
+  if(!LAST.length){resHost.innerHTML='';tagbar.innerHTML='';copybar.innerHTML='';
+    statusEl.className='status';statusEl.textContent='Nothing strained for this source right now. Try ALL, or add a keyword.';return;}
+  resHost.innerHTML=LAST.map((it,i)=>cardHTML(it,i)).join('');
+  resHost.querySelectorAll('.bridge').forEach(b=>b.addEventListener('click',()=>bridgeToEngine(LAST[+b.dataset.i])));
+  buildTagbar(LAST); updateCopybar();
+  const f=LAST.filter(x=>fitLabel(x.fit)==='Fit').length;
+  statusEl.className='status ok';
+  statusEl.textContent=`${LAST.length} strained \u00b7 ${f} tagged Fit \u00b7 verify each on the source page.`;
+}
+
+async function doStrain(){
+  const src=SOURCES.find(o=>o.v===srcEl.value)||SOURCES[0];
+  const kw=qEl.value.trim();
+  const queryText = src.q + (kw?`. Focus especially on: "${kw}"`:'');
+  btn.disabled=true; tagbar.innerHTML=''; copybar.innerHTML='';
+  statusEl.className='status';statusEl.innerHTML=`<span class="dot"></span>Straining ${esc(src.label.toLowerCase())} for live tenders\u2026`;
+  skeletons(Math.min(src.n,6));
   try{
-    const items = LIVE.mode==='proxy' ? await runProxy(q) : await runDirect(q);
-    renderResults(items);
+    const items = liveMode()==='proxy' ? await runProxy(queryText) : await runDirect(queryText,src.n);
+    render(items);
   }catch(err){
-    resHost.innerHTML='';
+    resHost.innerHTML='';tagbar.innerHTML='';copybar.innerHTML='';
     statusEl.className='status err';
-    const hint = LIVE.mode==='direct'
-      ? 'Live search failed. In the Claude artifact view this should work; if you\u2019ve deployed this file, set LIVE.mode = "proxy" and add the search.js backend. ('+esc(err.message)+')'
-      : 'Backend call failed — check that search.js is deployed and ANTHROPIC_API_KEY is set. ('+esc(err.message)+')';
-    statusEl.textContent=hint;
+    statusEl.textContent = liveMode()==='direct'
+      ? 'Strain failed in preview. To run it live, deploy the page + api/search.js to Vercel (or set apiBase to your Vercel URL on GitHub Pages). ('+esc(err.message)+')'
+      : 'Backend call failed \u2014 check api/search.js is deployed, ANTHROPIC_API_KEY is set in Vercel, and apiBase points to it. ('+esc(err.message)+')';
   }finally{ btn.disabled=false; }
 }
-btn.addEventListener('click',doSearch);
-qEl.addEventListener('keydown',e=>{if(e.key==='Enter')doSearch();});
+/* ---- bridge: strain -> triage engine ---- */
+const TAG2SECTOR={'Hospitality':'hosp','Nursing':'nurse','Japanese':'japan','TITP/SSW':'japan','Digital':'digi','Oil & Gas':'oil','Skill Dev':'skill','TVET':'skill','VTP':'skill','NSQF':'skill','PIA':'skill','RPL':'skill','NSDC':'skill'};
+const TAG2MARKER={'VTP':'VTP','RPL':'RPL','NSQF':'NSQF','NSDC':'NSDC','EOI':'EOI','TVET':'TEVT'};
+const TIER3=['JICA','TITP/SSW','Multilateral','World Bank','ADB','GIZ'];
+const TIER2=['NSDC','State','Central'];
+function setSeg(id,val){document.querySelectorAll('#'+id+' button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===String(val))));}
+function syncEngineUI(){
+  setSeg('seg-firm',state.firm); setSeg('seg-funder',state.funder); setSeg('seg-nw',state.nw); setSeg('seg-cons',state.cons);
+  document.querySelectorAll('#sectors .opt').forEach((l,i)=>{const on=state.sectors.has(SECTORS[i].id);l.querySelector('input').checked=on;l.classList.toggle('checked',on);});
+  document.querySelectorAll('#deliver .opt').forEach((l,i)=>{const on=state.deliver.has(DELIVER[i].id);l.querySelector('input').checked=on;l.classList.toggle('checked',on);});
+  document.querySelectorAll('#markers .mk').forEach(b=>b.setAttribute('aria-pressed',String(state.markers.has(b.textContent))));
+  const tt=document.getElementById('t-turnover'); tt.checked=state.turnover; tt.closest('.opt').classList.toggle('checked',state.turnover);
+  const td=document.getElementById('t-debar'); td.checked=state.debar; td.closest('.opt').classList.toggle('checked',state.debar);
+  score();
+}
+function bridgeToEngine(it){
+  if(!it)return;
+  const tags=Array.isArray(it.tags)?it.tags:[];
+  const sset=new Set(['skill']); tags.forEach(t=>{if(TAG2SECTOR[t])sset.add(TAG2SECTOR[t]);}); state.sectors=sset;
+  const mset=new Set(); tags.forEach(t=>{if(TAG2MARKER[t])mset.add(TAG2MARKER[t]);});
+  if((it.type||'').toLowerCase().includes('eoi'))mset.add('EOI'); state.markers=mset;
+  const dset=new Set(['train']); if(tags.includes('PIA'))dset.add('pia'); if(tags.includes('VTP'))dset.add('infra'); if(tags.includes('Consortium'))dset.add('cons'); state.deliver=dset;
+  state.funder = tags.some(t=>TIER3.includes(t))?3 : tags.some(t=>TIER2.includes(t))?2 : 2;
+  state.firm='firm'; state.nw='none'; state.cons='yes'; state.turnover=false; state.debar=false;
+  syncEngineUI();
+  document.getElementById('tab-eng').click();
+  window.scrollTo({top:0,behavior:'smooth'});
+  const n=document.getElementById('prefillNote');
+  n.innerHTML='<button class="x" aria-label="dismiss">\u00d7</button><span class="ttl">Pre-filled from a strain</span><b>'+esc(it.title||'tender')+'</b> \u2014 sectors, markers and funder were inferred from its tags. Now set the two things a listing can\u2019t reveal: the <b>net-worth treatment</b> and <b>bidder type</b> \u2014 then read the verdict below.';
+  n.classList.add('show');
+  n.querySelector('.x').addEventListener('click',()=>n.classList.remove('show'));
+}
+btn.addEventListener('click',doStrain);
+qEl.addEventListener('keydown',e=>{if(e.key==='Enter')doStrain();});
 </script>
 </body>
 </html>
