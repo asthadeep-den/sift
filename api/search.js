@@ -50,7 +50,8 @@ export default async function handler(req, res) {
       headers: {
         "content-type": "application/json",
         "x-api-key": key,
-        "anthropic-version": "2023-06-01"
+        "anthropic-version": "2023-06-01",
+        "anthropic-beta": "web-search-2025-03-05"
       },
       body: JSON.stringify({
         model: "claude-sonnet-4-6",
@@ -62,7 +63,8 @@ export default async function handler(req, res) {
 
     const data = await r.json();
     if (!r.ok) {
-      return res.status(502).json({ error: "Anthropic API error", detail: data });
+      const errMsg = (data && data.error && (data.error.message || data.error.type)) || JSON.stringify(data);
+      return res.status(502).json({ error: errMsg, detail: data });
     }
 
     const text = (data.content || [])
