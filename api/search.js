@@ -23,7 +23,9 @@ export default async function handler(req, res) {
   const query = (body.query || "").toString().trim();
   if (!query) return res.status(400).json({ error: "Missing 'query'." });
 
-  const key = process.env.ANTHROPIC_API_KEY;
+  // Strip UTF-8 BOM (U+FEFF, char 65279) that can appear when the env var is pasted from some editors
+  const _rawKey = process.env.ANTHROPIC_API_KEY || "";
+  const key = (_rawKey.charCodeAt(0) === 0xFEFF ? _rawKey.slice(1) : _rawKey).trim();
   if (!key) return res.status(500).json({ error: "ANTHROPIC_API_KEY not configured." });
 
   const prompt =
@@ -35,7 +37,7 @@ export default async function handler(req, res) {
     "Judge each opportunity's fit from this firm's lens. " +
     "Respond with ONLY a JSON array, no markdown fences, no preamble, maximum 10 items. " +
     'Each item keys exactly: {"title","authority","source","type","deadline","url","fit","reason","tags"}. ' +
-    '"type" is EOI, RFP or Tender. "deadline" is the submission date or "\u2014". ' +
+    '"type" is EOI, RFP or Tender. "deadline" is the submission date or "—". ' +
     '"fit" is exactly "Fit", "Mid" or "Not" (Fit = firm-based and squarely in-sector with feasible eligibility; ' +
     'Mid = partial sector match or eligibility/commoditisation doubt; Not = individual-only, out of sector or disqualifying). ' +
     '"reason" is one short sentence naming the biggest factor behind the fit tag. ' +
