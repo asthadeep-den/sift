@@ -11,9 +11,12 @@
 export default async function handler(req, res) {
   // CORS (safe to keep; same-origin requests work without it)
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   if (req.method === "OPTIONS") return res.status(204).end();
+  if (req.method === "GET") {
+    return res.status(200).json({ ok: true, service: "sift", hasKey: Boolean(process.env.ANTHROPIC_API_KEY) });
+  }
   if (req.method !== "POST") return res.status(405).json({ error: "POST only" });
 
   const body = typeof req.body === "string" ? safeJSON(req.body) : req.body || {};
@@ -51,7 +54,7 @@ export default async function handler(req, res) {
         model: "claude-sonnet-4-6",
         max_tokens: 1800,
         messages: [{ role: "user", content: prompt }],
-        tools: [{ type: "web_search_20250305", name: "web_search" }]
+        tools: [{ type: "web_search_20260209", name: "web_search" }]
       })
     });
 

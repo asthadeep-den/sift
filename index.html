@@ -663,7 +663,7 @@ async function runDirect(q,n){
     method:"POST", headers:{"Content-Type":"application/json"},
     body:JSON.stringify({model:LIVE.model, max_tokens:1600,
       messages:[{role:"user",content:buildPrompt(q,n)}],
-      tools:[{type:"web_search_20250305",name:"web_search"}]})
+      tools:[{type:"web_search_20260209",name:"web_search"}]})
   });
   if(!r.ok) throw new Error("API "+r.status);
   const data=await r.json();
@@ -671,8 +671,16 @@ async function runDirect(q,n){
   return parseJSON(text);
 }
 async function runProxy(q){
+  try{
+    const hc=await fetch(proxyEndpoint(),{method:"GET"});
+    if(hc.ok){const hd=await hc.json();if(!hd.hasKey)throw new Error("ANTHROPIC_API_KEY not set in Vercel — add it in Project → Settings → Environment Variables");}
+  }catch(e){if(e.message.includes("ANTHROPIC_API_KEY"))throw e;}
   const r=await fetch(proxyEndpoint(),{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({query:q})});
-  if(!r.ok) throw new Error("Backend "+r.status);
+  if(!r.ok){
+    let msg="Backend "+r.status;
+    try{const ed=await r.json();msg=ed.error||(ed.detail&&(ed.detail.error&&ed.detail.error.message||JSON.stringify(ed.detail)))||msg;}catch(_){}
+    throw new Error(msg);
+  }
   const d=await r.json();
   if(Array.isArray(d.results)) return d.results;
   if(typeof d.results==="string") return parseJSON(d.results);
@@ -772,7 +780,7 @@ async function doStrain(){
     statusEl.className='status err';
     statusEl.textContent = liveMode()==='direct'
       ? 'Strain failed in preview. To run it live, deploy the page + api/search.js to Vercel (or set apiBase to your Vercel URL on GitHub Pages). ('+esc(err.message)+')'
-      : 'Backend call failed \u2014 check api/search.js is deployed, ANTHROPIC_API_KEY is set in Vercel, and apiBase points to it. ('+esc(err.message)+')';
+      : 'Backend call failed \u2014 '+esc(err.message);
   }finally{ btn.disabled=false; }
 }
 /* ---- bridge: strain -> triage engine ---- */
